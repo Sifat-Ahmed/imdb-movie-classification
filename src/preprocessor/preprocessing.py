@@ -4,12 +4,6 @@ from typing import List
 from .constants import CONTRACTIONS
 
 import nltk
-
-# try:
-#     nltk.data.find("corpora/stopwords")
-# except LookupError:
-#     nltk.download("stopwords")
-
 from nltk.corpus import stopwords
 
 try:
@@ -24,6 +18,12 @@ class IMDBPreprocessor:
     def __init__(self, language: str = "english"):
         self.stop = set(stopwords.words(language))
         self.punct_table = str.maketrans("", "", string.punctuation)
+
+    def clean_text(self, text: str) -> str:
+        s = re.sub(r'\\n', ' ', text)  # remove literal \n
+        s = s.replace('\n', ' ')       # remove real newlines
+        s = re.sub(r'\s+', ' ', s)     # collapse spaces
+        return s.strip()
 
     def remove_html_tags(self, text: str) -> str:
         return re.sub(r"<[^>]+>", " ", text)
@@ -49,9 +49,23 @@ class IMDBPreprocessor:
     def to_lower(self, text: str) -> str:
         return text.lower()
 
+    def normalize_ratings(self, text: str) -> str:
+        """Replace n/10 ratings with categorical flags."""
+        def repl(m):
+            n = int(m.group(1))
+            if n >= 7:
+                return " RATING_POS "
+            elif n <= 3:
+                return " RATING_NEG "
+            else:  # 4,5,6
+                return " RATING_NEUTRAL "
+        return re.sub(r"\b([0-9]{1,2})\s*/\s*10\b", repl, text)
+
     def preprocess(self, text: str) -> str:
         x = self.remove_html_tags(text)
+        x = self.clean_text(x)
         x = self.handle_emojis(x)
+        x = self.normalize_ratings(x)   # <-- added here before punctuation removal
         x = self.to_lower(x)
         x = self.expand_contractions(x)
         x = self.remove_punctuations(x)

@@ -1,54 +1,53 @@
-import math
 import numpy as np
-from typing import List
+from scipy.sparse import issparse, csr_matrix
 
 class NaiveBayes:
-    """Multinomial Naive Bayes for pre-vectorized (dense) inputs with integer labels."""
-
     def __init__(self, alpha: float = 1.0):
         self.alpha = float(alpha)
         self.is_trained = False
 
-    def fit(self, X: np.ndarray, y: List[int]):
-        if not isinstance(X, np.ndarray):
-            raise ValueError("X must be a NumPy array")
-        if len(X) != len(y):
-            raise ValueError("X and y must have the same length")
-
+    def fit(self, X, y):
+        # accept csr or dense
+        y = np.asarray(y)
         self.classes_ = np.unique(y)
         n_classes = len(self.classes_)
         n_features = X.shape[1]
-        y = np.array(y, dtype=int)
 
-        # Class priors
-        class_counts = np.bincount(y, minlength=n_classes)
-        self.class_log_prior_ = np.log(class_counts / class_counts.sum())
+        self.class_log_prior_ = np.zeros(n_classes, dtype=np.float32)
+        feat_counts = np.zeros((n_classes, n_features), dtype=np.float32)
 
-        # Feature counts per class
-        feat_counts = np.zeros((n_classes, n_features), dtype=float)
-        for ci in range(n_classes):
-            feat_counts[ci] = X[y == ci].sum(axis=0)
+        if issparse(X):
+            X = X.tocsr()
+            n_samples = X.shape[0]
+            for idx, c in enumerate(self.classes_):
+                rows = np.where(y == c)[0]
+                # sum rows for this class; stays sparse then densify the 1×n_features result only
+                class_sum = X[rows].sum(axis=0)
+                feat_counts[idx, :] = np.asarray(class_sum).ravel().astype(np.float32)
+                self.class_log_prior_[idx] = np.log(len(rows) / n_samples)
+        else:
+            n_samples = X.shape[0]
+            for idx, c in enumerate(self.classes_):
+                feat_counts[idx, :] = X[y == c].sum(axis=0).astype(np.float32)
+                self.class_log_prior_[idx] = np.log((y == c).sum() / n_samples)
 
-        # Likelihoods with Laplace smoothing
-        alpha = self.alpha
-        denom = feat_counts.sum(axis=1) + alpha * n_features
-        self.feature_log_prob_ = np.log((feat_counts + alpha) / denom[:, None])
+        smoothed = feat_counts + self.alpha
+        self.feature_log_prob_ = (
+            np.log(smoothed) - np.log(smoothed.sum(axis=1, keepdims=True))
+        ).astype(np.float32)
 
         self.is_trained = True
         return self
 
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+    def predict_log_proba(self, X):
         if not self.is_trained:
-            raise ValueError("Call fit before predict_proba")
-        if not isinstance(X, np.ndarray):
-            raise ValueError("X must be a NumPy array")
+            raise ValueError("Model must be trained before making predictions")
+        if issparse(X):
+            X = X.tocsr()
+            jll = X @ self.feature_log_prob_.T  # sparse @ dense -> dense
+        else:
+            jll = X @ self.feature_log_prob_.T
+        return (jll + self.class_log_prior_).astype(np.float32)
 
-        logj = self.class_log_prior_ + X.dot(self.feature_log_prob_.T)
-        max_logj = logj.max(axis=1, keepdims=True)
-        probs = np.exp(logj - max_logj)
-        probs /= probs.sum(axis=1, keepdims=True)
-        return probs
-
-    def predict(self, X: np.ndarray) -> List[int]:
-        probs = self.predict_proba(X)
-        return probs.argmax(axis=1).tolist()
+    def predict(self, X):
+        return self.predict_log_proba(X).argmax(axis=1)

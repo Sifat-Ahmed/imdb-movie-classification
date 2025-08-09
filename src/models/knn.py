@@ -1,84 +1,52 @@
-# knn.py
 import numpy as np
-from typing import List, Union
-from collections import Counter
-from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
+from scipy.sparse import issparse, csr_matrix
+from sklearn.metrics.pairwise import cosine_similarity
 
 class KNN:
-    """KNN implementation that expects pre-vectorized inputs."""
-
-    def __init__(self, k: int = 5, distance_metric: str = 'cosine'):
-        if distance_metric not in ('cosine', 'euclidean'):
-            raise ValueError("distance_metric must be 'cosine' or 'euclidean'")
-        self.k = k
+    def __init__(self, k=7, distance_metric="cosine", batch_size=2000):
+        self.k = int(k)
         self.distance_metric = distance_metric
-        self.X_train = None
-        self.y_train = None
-        self.classes_ = None
+        self.batch_size = int(batch_size)
         self.is_trained = False
 
-    def fit(self, X: np.ndarray, y: List[int]):
-        """Store precomputed training vectors and labels."""
-        if len(X) != len(y):
-            raise ValueError("X and y must have the same length")
-        self.X_train = X  # already vectorized
-        self.y_train = np.array(y)
-        self.classes_ = np.unique(self.y_train)
-        if self.k < 1 or self.k > len(self.y_train):
-            raise ValueError(f"k must be in [1, {len(self.y_train)}]")
+    def fit(self, X, y):
+        # accept dense or sparse; keep as CSR if sparse
+        self.X_train = X.tocsr() if issparse(X) else X
+        self.y_train = np.asarray(y)
+        n_samples = self.X_train.shape[0]   # <-- FIX: don't use len(X)
+        if n_samples != len(self.y_train):
+            raise ValueError("X and y must have the same number of rows")
         self.is_trained = True
         return self
 
-    def _calculate_distances(self, X_test: np.ndarray) -> np.ndarray:
-        """Calculate distances between test and training samples using sklearn pairwise funcs."""
-        if self.distance_metric == 'cosine':
-            similarities = cosine_similarity(X_test, self.X_train)
-            return 1.0 - similarities
-        elif self.distance_metric == 'euclidean':
-            return euclidean_distances(X_test, self.X_train)
-
-    def predict(self, X: np.ndarray) -> List[Union[str, int]]:
-        """Predict labels for pre-vectorized test samples."""
-        if not self.is_trained:
-            raise ValueError("Model must be trained before making predictions")
-
-        distances = self._calculate_distances(X)
-        n = distances.shape[0]
-        preds: List[Union[str, int]] = []
-        k = min(self.k, len(self.y_train))
-
-        for i in range(n):
-            # use argpartition for speed; order neighbors only within top-k if needed
-            nn_idx = np.argpartition(distances[i], k - 1)[:k]
-            nn_labels = self.y_train[nn_idx]
-            preds.append(Counter(nn_labels).most_common(1)[0][0])
-
+    def _predict_batch(self, Xb):
+        if self.distance_metric != "cosine":
+            raise NotImplementedError("Only cosine is implemented sparsely.")
+        # cosine similarity; keep result sparse
+        sims = cosine_similarity(Xb, self.X_train, dense_output=False)
+        preds = np.empty(Xb.shape[0], dtype=int)
+        for i in range(Xb.shape[0]):
+            row = sims.getrow(i)
+            if row.nnz == 0:
+                preds[i] = 0  # fallback to majority class or 0
+                continue
+            k = min(self.k, row.nnz)
+            # top-k indices by similarity
+            topk_idx = np.argpartition(row.data, -k)[-k:]
+            nn_indices = row.indices[topk_idx]
+            nn_labels = self.y_train[nn_indices]
+            # majority vote
+            vals, counts = np.unique(nn_labels, return_counts=True)
+            preds[i] = vals[counts.argmax()]
         return preds
 
-    def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        """Return class probabilities via inverse-distance weighting."""
+    def predict(self, X):
         if not self.is_trained:
             raise ValueError("Model must be trained before making predictions")
-
-        distances = self._calculate_distances(X)
-        classes = self.classes_
-        class_to_idx = {c: i for i, c in enumerate(classes)}
-        n = distances.shape[0]
-        k = min(self.k, len(self.y_train))
-        probs = []
-
-        for i in range(n):
-            nn_idx = np.argpartition(distances[i], k - 1)[:k]
-            nn_d = distances[i][nn_idx]
-            nn_labels = self.y_train[nn_idx]
-
-            # inverse distance weights (protect zero)
-            w = 1.0 / (nn_d + 1e-8)
-            totals = np.zeros(len(classes), dtype=float)
-            for lab, ww in zip(nn_labels, w):
-                totals[class_to_idx[lab]] += ww
-
-            s = totals.sum()
-            probs.append(totals / s if s > 0 else np.ones(len(classes)) / len(classes))
-
-        return np.vstack(probs)
+        Xb = X.tocsr() if issparse(X) else X
+        n = Xb.shape[0]
+        out = np.empty(n, dtype=int)
+        for start in range(0, n, self.batch_size):
+            stop = min(start + self.batch_size, n)
+            out[start:stop] = self._predict_batch(Xb[start:stop])
+        return out

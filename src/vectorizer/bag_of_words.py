@@ -1,20 +1,23 @@
 import math
-import numpy as np
+import time
 from collections import Counter
-from typing import List, Iterable, Tuple, Union
+from typing import List
+
+import numpy as np
+from scipy.sparse import csr_matrix
+
 
 class BoWVectorizer:
     """
     Bag-of-Words vectorizer for pre-tokenized documents.
-    - Input to fit/transform: List[List[str]]  (each doc is a list of tokens)
-    - Output: np.ndarray of shape (n_docs, n_features)
-    - binary=True -> presence/absence; binary=False -> counts
-    - Supports min_df (int or float)
+    Input: List[List[str]]  (each doc is a list of tokens)
+    Output: scipy.sparse.csr_matrix (n_docs, n_features)
     """
 
-    def __init__(self, binary: bool = True, min_df: Union[int, float] = 1):
+    def __init__(self, binary: bool = True, min_df=1, verbose: bool = False):
         self.binary = bool(binary)
         self.min_df = min_df
+        self.verbose = bool(verbose)
         self.vocab_ = {}
         self.feature_names_ = []
         self.fitted_ = False
@@ -25,39 +28,65 @@ class BoWVectorizer:
         return df_count >= int(self.min_df)
 
     def fit(self, docs_tokens: List[List[str]]):
+        t0 = time.perf_counter()
         N = len(docs_tokens)
         df = Counter()
+
         for toks in docs_tokens:
-            df.update(set(toks))  # document frequency
+            if toks:
+                df.update(set(toks))
 
         terms = [t for t, c in df.items() if self._passes_min_df(c, N)]
-        terms.sort()  # deterministic
+        terms.sort()
         self.vocab_ = {t: i for i, t in enumerate(terms)}
         self.feature_names_ = terms
         self.fitted_ = True
+
+        if self.verbose:
+            dt = time.perf_counter() - t0
+            print(f"[BoWVectorizer] fit: docs={N}, vocab_size={len(terms)}, time={dt:.3f}s")
         return self
 
-    def transform(self, docs_tokens: List[List[str]]) -> np.ndarray:
+    def transform(self, docs_tokens: List[List[str]]):
         if not self.fitted_:
             raise ValueError("Call fit before transform.")
         V = len(self.vocab_)
-        X = np.zeros((len(docs_tokens), V), dtype=np.float32)
+        N = len(docs_tokens)
+
+        rows, cols, data = [], [], []
+
         for i, toks in enumerate(docs_tokens):
+            if not toks:
+                continue
             if self.binary:
                 for t in set(toks):
                     j = self.vocab_.get(t)
                     if j is not None:
-                        X[i, j] = 1.0
+                        rows.append(i)
+                        cols.append(j)
+                        data.append(1.0)
             else:
-                for t in toks:
+                counts = Counter(toks)
+                for t, c in counts.items():
                     j = self.vocab_.get(t)
                     if j is not None:
-                        X[i, j] += 1.0
+                        rows.append(i)
+                        cols.append(j)
+                        data.append(float(c))
+
+        X = csr_matrix((np.array(data, dtype=np.float32),
+                        (np.array(rows, dtype=np.int32),
+                         np.array(cols, dtype=np.int32))),
+                       shape=(N, V), dtype=np.float32)
+
+        if self.verbose:
+            nnz = X.nnz
+            density = nnz / (N * V) if N and V else 0
+            print(f"[BoWVectorizer] transform: shape={X.shape}, nnz={nnz}, density={density:.6f}")
         return X
 
-    def fit_transform(self, docs_tokens: List[List[str]]) -> np.ndarray:
-        self.fit(docs_tokens)
-        return self.transform(docs_tokens)
+    def fit_transform(self, docs_tokens: List[List[str]]):
+        return self.fit(docs_tokens).transform(docs_tokens)
 
     def get_feature_names_out(self) -> List[str]:
         return list(self.feature_names_)
