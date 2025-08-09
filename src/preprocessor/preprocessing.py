@@ -1,6 +1,8 @@
 import re
 import string
 from typing import List
+from .constants import CONTRACTIONS
+
 import nltk
 
 # try:
@@ -14,6 +16,8 @@ try:
     import emoji as _emoji
 except Exception:
     _emoji = None
+
+CONTRACTIONS_RE = re.compile(r"\b(" + "|".join(map(re.escape, CONTRACTIONS.keys())) + r")\b")
 
 
 class IMDBPreprocessor:
@@ -39,6 +43,9 @@ class IMDBPreprocessor:
     def normalize_spaces(self, text: str) -> str:
         return re.sub(r"\s+", " ", text).strip()
 
+    def expand_contractions(self, text: str) -> str:
+        return CONTRACTIONS_RE.sub(lambda m: CONTRACTIONS[m.group(0)], text)
+
     def to_lower(self, text: str) -> str:
         return text.lower()
 
@@ -46,6 +53,7 @@ class IMDBPreprocessor:
         x = self.remove_html_tags(text)
         x = self.handle_emojis(x)
         x = self.to_lower(x)
+        x = self.expand_contractions(x)
         x = self.remove_punctuations(x)
         x = self.remove_stop_words(x)
         x = self.normalize_spaces(x)
