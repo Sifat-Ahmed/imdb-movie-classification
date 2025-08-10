@@ -22,14 +22,13 @@ class RNN(nn.Module):
 
         self.emb = nn.Embedding(vocab_size, emb_dim, padding_idx=0)
 
-        self.rnn = nn.RNN(
+        self.rnn = nn.GRU(
             input_size=emb_dim,
             hidden_size=hidden_size,
             num_layers=num_layers,
             batch_first=True,
             bidirectional=self.bidirectional,
             dropout=dropout if num_layers > 1 else 0.0,
-            nonlinearity="tanh",
         )
 
         out_dim = hidden_size * (2 if self.bidirectional else 1)
