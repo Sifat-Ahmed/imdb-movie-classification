@@ -5,6 +5,7 @@ from .constants import CONTRACTIONS
 
 import nltk
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 try:
     import emoji as _emoji
@@ -15,9 +16,17 @@ CONTRACTIONS_RE = re.compile(r"\b(" + "|".join(map(re.escape, CONTRACTIONS.keys(
 
 
 class IMDBPreprocessor:
-    def __init__(self, language: str = "english"):
+    def __init__(self, language: str = "english", do_stemming: bool = False, do_lemmatizing: bool = False):
         self.stop = set(stopwords.words(language))
         self.punct_table = str.maketrans("", "", string.punctuation)
+
+        # Store flags
+        self.do_stemming = do_stemming
+        self.do_lemmatizing = do_lemmatizing
+
+        # Initialize stemmer/lemmatizer only if needed
+        self.stemmer = PorterStemmer() if self.do_stemming else None
+        self.lemmatizer = WordNetLemmatizer() if self.do_lemmatizing else None
 
     def clean_text(self, text: str) -> str:
         s = re.sub(r'\\n', ' ', text)  # remove literal \n
@@ -61,15 +70,34 @@ class IMDBPreprocessor:
                 return " RATING_NEUTRAL "
         return re.sub(r"\b([0-9]{1,2})\s*/\s*10\b", repl, text)
 
+    def stem_tokens(self, text: str) -> str:
+        if not self.do_stemming:
+            return text
+        tokens = text.split()
+        return " ".join(self.stemmer.stem(t) for t in tokens)
+
+    def lemmatize_tokens(self, text: str) -> str:
+        if not self.do_lemmatizing:
+            return text
+        tokens = text.split()
+        return " ".join(self.lemmatizer.lemmatize(t) for t in tokens)
+
     def preprocess(self, text: str) -> str:
         x = self.remove_html_tags(text)
         x = self.clean_text(x)
         x = self.handle_emojis(x)
-        x = self.normalize_ratings(x)   # <-- added here before punctuation removal
+        x = self.normalize_ratings(x)
         x = self.to_lower(x)
         x = self.expand_contractions(x)
         x = self.remove_punctuations(x)
         x = self.remove_stop_words(x)
+
+        # Apply optional normalization steps
+        if self.do_lemmatizing:
+            x = self.lemmatize_tokens(x)
+        if self.do_stemming:
+            x = self.stem_tokens(x)
+
         x = self.normalize_spaces(x)
         return x
 

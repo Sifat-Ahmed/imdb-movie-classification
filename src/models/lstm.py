@@ -37,3 +37,36 @@ class LSTM(nn.Module):
         last = self.dropout(last)
         logit = self.fc(last).squeeze(1)  # (B,)
         return logit
+
+
+class GloVeLSTM(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim, num_layers, bidirectional, dropout, pad_idx,
+                 pretrained_embeddings=None):
+        super().__init__()
+
+        self.embedding = nn.Embedding(vocab_size, emb_dim, padding_idx=pad_idx)
+
+        if pretrained_embeddings is not None:
+            self.embedding.weight.data.copy_(pretrained_embeddings)
+            self.embedding.weight.requires_grad = False  # freeze GloVe weights
+
+        self.lstm = nn.LSTM(
+            emb_dim, hidden_dim, num_layers=num_layers,
+            bidirectional=bidirectional, batch_first=True,
+            dropout=dropout if num_layers > 1 else 0
+        )
+
+        out_dim = hidden_dim * (2 if bidirectional else 1)
+        self.fc = nn.Linear(out_dim, 1)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        embedded = self.embedding(x)
+        output, (hidden, cell) = self.lstm(embedded)
+
+        if self.lstm.bidirectional:
+            hidden = torch.cat((hidden[-2], hidden[-1]), dim=1)
+        else:
+            hidden = hidden[-1]
+
+        return self.fc(self.dropout(hidden)).squeeze(1)
