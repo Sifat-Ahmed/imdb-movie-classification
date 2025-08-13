@@ -246,6 +246,26 @@ Performance Stability: <0.4% variance between top configs
 - DNN and LSTM optimal at threshold=0.5 (balanced)
 - Suggests different confidence calibration across architectures
 
+### Insights of DistilBERT
+#### ROC Curve analysis
+- AUC Score: The model achieved an ROC AUC of 0.975, indicating excellent ranking ability between positive and negative samples.
+- The ROC curve remains close to the top-left corner, confirming a low false positive rate for high true positive rates.
+- The stability of the curve suggests the model is well-calibrated for a variety of operating thresholds.
+
+#### Precision-Recall (PR) Curve Analysis
+- Average Precision (AP) remains consistent at 0.975 across thresholds, indicating that the model maintains a high level of precision even as recall varies.
+- This consistency implies the model's confidence scores are reliable, with minimal degradation when the decision threshold is adjusted.
+
+#### Confusion Matrix Trends
+- Threshold 0.50 : Balanced performance between false positives (416) and false negatives (393). Suitable when both precision and recall are equally important.
+
+- Threshold 0.60 Slight reduction in false positives (377) with a small increase in false negatives (443). Appropriate if precision is marginally more important than recall.
+
+- Threshold 0.70 Significant drop in false positives (337) but noticeable increase in false negatives (493). Ideal for scenarios where minimizing false alarms is critical.
+
+- Threshold 0.80 - Minimal false positives (287) but higher false negatives (559). Best suited for applications where incorrect positive predictions have a high operational or financial cost.
+
+
 ---
 
 ## Implementation Details
