@@ -62,6 +62,12 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 - Leverages pre-trained tokenizers and embeddings
 > Please refer to [EDA Notebook](/notebooks/Step_1.eda_preprocessing.ipynb) for details. There is also documentation related to preprocessing available on [Docs](/documentation/preprocessor.md).
 
+
+<figure>
+ <img width="1340" height="449" alt="image" src="https://github.com/user-attachments/assets/8e8c4b98-eda7-42aa-8eb7-ff0925d91a71" />
+  <center>Data counts for  positive, negative classes</center>
+</figure>
+
 ---
 
 ## Methodology
@@ -129,6 +135,11 @@ The final model was trained based on the best parameter and results found. For t
 | 8 | Traditional ML | Logistic Regression | 0.880 | 0.880 | ~1 min | Interpretable baseline |
 | 9 | Scratch | Naive Bayes (TF-IDF) | 0.868 | 0.867 | ~30 sec | Custom implementation |
 | 10 | Scratch | KNN (TF-IDF) | 0.815 | 0.826 | ~5 min | Distance-based classifier |
+
+<figure>
+  <img width="1341" height="664" alt="image" src="https://github.com/user-attachments/assets/1ba119fc-e379-4190-a08a-783c3a68b59a" />
+  <center>Top features selected by Linear SVC</center>
+</figure>
 
 ### Cross-Validation Results (Top Models)
 
