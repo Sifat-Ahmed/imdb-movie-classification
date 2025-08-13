@@ -73,6 +73,8 @@ set MODEL_DIR=runs/distilbert_auto/final_model   # Windows PowerShell: $env:MODE
 uvicorn src.app:app --host 0.0.0.0 --port 8000
 ```
 
+> Extensive documentation is available [Here. (API.md)](/documentation/api.md)
+
 ## Endpoints
 
 - `GET /health` – service status

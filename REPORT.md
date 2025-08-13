@@ -45,7 +45,7 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 ### Preprocessing Pipeline
 
 **Traditional ML Models (Applied):**
-```python
+```
 # Comprehensive text cleaning pipeline
 1. HTML tag removal: <br />, <p>, etc.
 2. Newline and space normalization
@@ -60,6 +60,7 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 **Transformer Models (Minimal Processing):**
 - Raw text
 - Leverages pre-trained tokenizers and embeddings
+> Please refer to [EDA Notebook](/notebooks/Step_1.eda_preprocessing.ipynb) for details. There is also documentation related to preprocessing available on [Docs](/documentation/preprocessor.md).
 
 ### Data Quality Analysis
 *[Recommend Graph 1: Review length distribution histogram]*
@@ -68,6 +69,12 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 ---
 
 ## Methodology
+
+The idea of this methodology is to explore several approaches to create an app that can detect positive/negative sentiment from a given movie review.
+
+This problem has been approached methodically. For an example, doing Exploratory Data Analysis, building ML models from scratch, training pre-built models and then incrementally increasing model complexity from Classical methods to neural networks and finally ending in Transformer based approach. The goal here is to identify the proper model that can be used depending on the scenario, reasoning behind choosing parameters overall doing Research and Development. 
+
+> There is a notebook for every step. WHich has been also linked below. These notebooks contain all the images, tables, graphs needed. This report only contains a summary. 
 
 ### Step 1: Baseline Implementation (Scratch Models)
 Implemented foundational algorithms from scratch to understand core mechanisms:
@@ -80,12 +87,17 @@ Optimized implementations using scikit-learn:
 - Vectorization: TF-IDF with n-gram combinations (unigrams, bigrams, trigrams)
 - Optimization: Grid search across regularization, vocabulary size, and feature selection
 
+> Please refer to [ML Classification Notebook](/notebooks/Step_2.ML_classification.ipynb) for details. There is also documentation related to Models available on [Docs](/documentation/models.md).
+
 ### Step 2: Deep Learning Models
 Neural network architectures with PyTorch:
 - DNN: Dense layers with dropout regularization
 - RNN/LSTM: Recurrent architectures with bidirectional processing
 - Embeddings: Custom embeddings vs. pre-trained GloVe (100-dim)
 - Architecture: Embedding → RNN/LSTM → Dropout → Linear classifier
+
+> Please refer to [DNN Classification Notebook](/notebooks/Step_3.DNN_Classification.ipynb) for details. There is also documentation related to Models available on [Docs](/documentation/models.md).
+
 
 ### Step 3: Cross-Validation and Hyperparameter Optimization
 Rigorous evaluation methodology:
@@ -99,6 +111,9 @@ State-of-the-art approach using Hugging Face Transformers:
 - Strategy: Fine-tuning with task-specific classification head
 - Optimization: Learning rate scheduling, weight decay, early stopping
 
+> Please refer to [Cross Validation & Tuning Notebook](/notebooks/Step_4.CrossVal_Tuning.ipynb) for details.
+
+The final model was trained based on the best parameter and results found. For the app, DIstilBERT was trained with the best parameters set.
 
 ---
 
@@ -218,32 +233,55 @@ Performance Stability: <0.4% variance between top configs
 
 ### Project Structure
 ```
+movie-sentiment-classification/
 ├── configs/
-│   └── distilbert.yaml           # Transformer configuration
+│   └── distilbert.yaml
 ├── data/
-│   ├── glove.6B.100d.txt        # Pre-trained embeddings
-│   ├── IMDB_Dataset.csv         # Raw dataset
-│   └── imdb_reviews.parquet     # Processed dataset
+│   ├── glove.6B.100d.txt
+│   ├── IMDB_Dataset.csv
+│   └── imdb_reviews.parquet
+├── documentation/
+│   ├── API_DOCUMENTATION.md      # Your comprehensive API docs
+│   ├── preprocessor.md
+│   ├── vectorizer.md
+│   └── classifier.md
 ├── notebooks/
-│   ├── Step_1.eda_preprocessing.ipynb    # EDA and cleaning
-│   ├── Step_2.ML_classification.ipynb   # Traditional ML
-│   ├── Step_3.DNN_Classification.ipynb  # Deep learning
-│   └── Step_4.CrossVal_Tuning.ipynb     # Optimization
+│   ├── Step_1.eda_preprocessing.ipynb
+│   ├── Step_2.ML_classification.ipynb
+│   ├── Step_3.DNN_Classification.ipynb
+│   └── Step_4.CrossVal_Tuning.ipynb
 ├── src/
-│   ├── models/                   # Model implementations
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── dnn.py               # Deep Neural Network
+│   │   ├── lstm.py              # LSTM models
+│   │   ├── rnn.py               # RNN models
 │   │   ├── naive_bayes.py       # Scratch Naive Bayes
-│   │   ├── knn.py               # Scratch KNN
-│   │   └── [other models]
-│   ├── vectorizer/              # Custom vectorizers
-│   │   ├── bag_of_words.py      # BoW implementation
-│   │   └── tfidf.py             # TF-IDF implementation
-│   ├── utils/                   # Utilities
-│   │   ├── model_utils.py       # Evaluation functions
-│   │   └── embeddings.py        # GloVe loader
-│   └── app.py                   # Flask API
-├── requirements-prod.txt         # Production dependencies
-├── Dockerfile                   # Containerization
-└── README.md                    # Setup instructions
+│   │   └── knn.py               # Scratch KNN
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── constants.py         # Contractions dictionary
+│   │   ├── preprocessing.py     # Text preprocessing
+│   │   ├── pos_tag.py          # POS tagging utilities
+│   │   ├── embeddings.py        # GloVe embeddings loader
+│   │   ├── model_dataclass.py   # Model evaluation dataclass
+│   │   └── model_utils.py       # Evaluation and plotting functions
+│   ├── vectorizer/
+│   │   ├── __init__.py
+│   │   ├── bag_of_words.py      # Custom BoW implementation
+│   │   └── tfidf.py             # Custom TF-IDF implementation
+│   └── app.py                   # FastAPI application
+├── models/
+│   └── saved_models/            # Trained model artifacts
+├── runs/
+│   └── distilbert_auto/
+│       └── final_model/         # DistilBERT fine-tuned model
+├── requirements-dev.txt         # Development dependencies
+├── requirements-prod.txt        # Production dependencies
+├── Dockerfile                   # Container configuration
+├── REPORT.md                   # Comprehensive project report
+├── README.md                   # Setup and usage instructions
+└── main.py                     # Main training script
 ```
 
 ### Technical Implementation Notes
@@ -279,7 +317,7 @@ Performance Stability: <0.4% variance between top configs
 1. Ensemble Methods: Combine top models using voting or stacking,bagging, boosting
 2. Advanced Transformers: Experiment with RoBERTa, ELECTRA, or newer architectures
 
-### Model Degradation (Bonsu Task)
+### Model Degradation (Bonus Task)
 1. **Early Detection**
 - Data Quality Monitoring (Vocabulary, Review Patterns)
 - User feedback 
@@ -289,7 +327,7 @@ Performance Stability: <0.4% variance between top configs
 - Data collection from several sources (when a new movie is released)
 - Continuous training and Testing (Running parallely with production model) , A/B Testing
 
-3. LLM /Agentic Supervising
+3. **LLM /Agentic Supervising**
 - Synthetic data for drifted regions
 - Teacher-student system to score/justify predictions on recent data and re-train with the new data
 - LLMs can be costly, so minimal usage is preferred
@@ -297,7 +335,7 @@ Performance Stability: <0.4% variance between top configs
 ## Appendix
 
 ### A. Hardware and Environment
-- GPU: NVIDIA RTX 4080 (12GB VRAM)
+- GPU: NVIDIA RTX 4070 Ti (12GB VRAM)
 - RAM: 64GB DDR5
 - Framework: PyTorch 1.12, Scikit-learn 1.1, Transformers 4.21
 - Training Time: Total ~6 hours across all experiments
