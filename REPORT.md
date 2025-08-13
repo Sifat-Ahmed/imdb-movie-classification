@@ -42,8 +42,8 @@ Applied k-fold cross-validation with grid search on top-performing models from S
 ### Results and Observations
 | Model                         | Mean Accuracy | Mean F1 | Notes                               |
 |-------------------------------|--------------:|--------:|-------------------------------------|
-| Logistic Regression (Scratch) |         0.850 |   0.850 | Baseline scratch implementation     |
-| Naive Bayes (Scratch)         |         0.830 |   0.830 | Baseline scratch implementation     |
+| Naive Bayes (Scratch)         |         0.868 |   0.867 | Baseline scratch implementation     |
+| KNN (Scratch)                 |         0.815 |   0.825 | Baseline scratch implementation     |
 | Logistic Regression (Sklearn) |         0.880 |   0.880 | Improved over scratch               |
 | LinearSVC (Tuned)             |         0.911 |   0.911 | Best tuned ML model                 |
 | SGDClassifier (Tuned)         |         0.908 |   0.908 | Close to LinearSVC                  |
