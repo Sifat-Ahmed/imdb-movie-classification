@@ -1,0 +1,11 @@
+.idea
+data
+**/.ipynb_checkpoints
+.virtual_documents
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.cache/
+.pytest_cache/

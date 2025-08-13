@@ -52,8 +52,8 @@ def _predict_batch(texts: List[str], max_length: int, threshold: float) -> List[
     )
     enc = {k: v.to(DEVICE) for k, v in enc.items()}
     with torch.no_grad():
-        logits = model(**enc).logits  # (B, 2) for DistilBERT seq cls
-        probs = torch.softmax(logits, dim=-1)  # [:,0]=neg, [:,1]=pos
+        logits = model(**enc).logits
+        probs = torch.softmax(logits, dim=-1)
 
     pos = probs[:, 1].cpu().numpy()
     neg = probs[:, 0].cpu().numpy()
