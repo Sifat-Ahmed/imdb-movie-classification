@@ -14,6 +14,58 @@ The goal of this study is to classify IMDB movie reviews as positive or negative
 ### Overview
 The project begins with EDA to understand the dataset and clean the text data. Basic machine learning models are implemented first in both scratch and scikit-learn to establish a performance baseline. Deep learning models (DNN, RNN, LSTM) and a transformer-based model (DistilBERT) are then applied. Finally, the best models from the earlier stages are tuned using k-fold cross-validation and grid search to optimize their performance.
 
+### Project Structure
+```
+├── configs/
+│   └── distilbert.yaml
+├── data/
+│   ├── glove.6B.100d.txt
+│   ├── IMDB_Dataset.csv
+│   └── imdb_reviews.parquet
+├── documentation/
+│   ├── preprocessor.md
+│   ├── vectorizer.md
+│   ├── classifier.md
+│   └── api.md
+├── notebooks/
+│   ├── Step_1.eda_preprocessing.ipynb
+│   ├── Step_2.ML_classification.ipynb
+│   ├── Step_3.DNN_Classification.ipynb
+│   └── Step_4.CrossVal_Tuning.ipynb
+├── src/
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── naive_bayes.py
+│   │   ├── knn.py
+│   │   ├── modern_models.py
+│   │   └── base_model.py
+│   ├── preprocessor/
+│   │   ├── __init__.py
+│   │   ├── text_processor.py
+│   │   └── vectorizers.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── embeddings.py
+│   │   ├── model_dataclass.py
+│   │   └── model_utils.py
+│   ├── vectorizer/
+│   │   ├── __init__.py
+│   │   ├── bag_of_words.py
+│   │   └── tfidf.py
+│   ├── app.py
+│   └── train.py
+├── models/
+│   └── saved_models/
+├── runs/
+├── requirements-dev.txt
+├── requirements-prod.txt
+├── Dockerfile
+├── REPORT.md
+├── README.md
+└── main.py
+```
+
+
 ### Methods
 #### Step 1: Data Preprocessing and EDA
 - Removal of HTML tags, newline characters, and extra spaces.
@@ -64,6 +116,11 @@ Scratch models were significantly slower without performance gain.
 
 #### Effect of EDA
 Data cleaning steps removed noise and standardized text, improving the performance of all models. Without EDA, models showed lower accuracy and higher variance across runs.
+- Data Cleaning was only applied to traditional ML models and DNN+RNN models. 
+- For vector based models, data were passed as they were because vector based models consider everything to generate embeddings.
 
 ### Conclusion
 The experiments demonstrate that transformer-based models like DistilBERT can achieve the best results on IMDB sentiment classification, even with reduced size compared to BERT. Classical ML algorithms, particularly LinearSVC, remain competitive when tuned, offering a faster and lighter alternative. Cross-validation and grid search are essential to reliably assess model performance and prevent overfitting. EDA plays a critical role in ensuring input quality and improving model stability.
+
+#### What to be Done
+- There are bagging, boosting and ensemble models that were not explored which can be explored in future to improve score.
