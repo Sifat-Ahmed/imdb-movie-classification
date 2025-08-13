@@ -1,0 +1,32 @@
+model_name: distilbert-base-uncased
+
+dataset_csv: data/IMDB_Dataset.csv
+text_col: review        # optional (defaults to "text")
+label_col: sentiment    # optional (defaults to "label")
+seed: 42
+
+# training
+lr: 0.00001
+bsz: 16
+epochs: 3
+wd: 0.01
+max_length: 256
+
+# trainer flags
+eval_strategy: "epoch"
+save_strategy: "epoch"
+disable_tqdm: false
+log_level: "error"
+log_level_replica: "error"
+logging_steps: 50
+report_to: ["none"]
+fp16: true
+
+# early stopping
+early_stopping: true
+early_stopping_patience: 2
+load_best_model_at_end: true
+metric_for_best_model: "accuracy"
+greater_is_better: true
+
+output_dir: runs/distilbert_auto
