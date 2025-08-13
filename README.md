@@ -10,7 +10,8 @@ End-to-end pipeline for IMDB movie review sentiment analysis:
 - Dockerized deployment
 
 > - See [Report](REPORT.md) for extensive analysis.
-> - [Documentation](/documentation) contains specific docs for the repo. 
+> - [Documentation](/documentation) contains specific docs for the repo.
+
 
 ## Environment
 
@@ -69,6 +70,12 @@ python src/train.py --config configs/distilbert.yaml
 
 
 ### API Server
+
+### Pre-trained Weights 
+> Download the weights from https://drive.google.com/drive/folders/16tlUwq_1BX8Jlwb4JDjjfjrCCILdzW1H?usp=sharing and paste the contents inside runs folder
+
+#### Running the App
+
 ```bash
 set MODEL_DIR=runs/distilbert_auto/final_model   # Windows PowerShell: $env:MODEL_DIR="..."
 uvicorn src.app:app --host 0.0.0.0 --port 8000
