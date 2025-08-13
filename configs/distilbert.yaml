@@ -6,9 +6,9 @@ label_col: sentiment    # optional (defaults to "label")
 seed: 42
 
 # training
-lr: 0.00001
-bsz: 16
-epochs: 3
+lr: 0.00005
+bsz: 32
+epochs: 2
 wd: 0.01
 max_length: 256
 
