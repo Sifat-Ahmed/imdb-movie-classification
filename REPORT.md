@@ -142,7 +142,7 @@ The final model was trained based on the best parameter and results found. For t
 
 <figure>
   <img width="1341" height="664" alt="image" src="https://github.com/user-attachments/assets/1ba119fc-e379-4190-a08a-783c3a68b59a" />
-  <p style="text-align: center;"s>Top features selected by Linear SVC</p>
+  <p style="text-align: center;"s>Fig 2: Top features selected by Linear SVC</p>
 </figure>
 
 ### Cross-Validation Results (Top Models)
@@ -251,20 +251,22 @@ Performance Stability: <0.4% variance between top configs
 - AUC Score: The model achieved an ROC AUC of 0.975, indicating excellent ranking ability between positive and negative samples.
 - The ROC curve remains close to the top-left corner, confirming a low false positive rate for high true positive rates.
 - The stability of the curve suggests the model is well-calibrated for a variety of operating thresholds.
+<img width="908" height="724" alt="image" src="https://github.com/user-attachments/assets/2a776855-de32-4715-9bd8-72201f79169c" />
+Fig 3: ROC Curve for DistilBERT with different thresholds
 
 #### Precision-Recall (PR) Curve Analysis
 - Average Precision (AP) remains consistent at 0.975 across thresholds, indicating that the model maintains a high level of precision even as recall varies.
 - This consistency implies the model's confidence scores are reliable, with minimal degradation when the decision threshold is adjusted.
+<img width="907" height="721" alt="image" src="https://github.com/user-attachments/assets/b30ad44e-3812-4cbb-8836-9701a2a77b9c" />
+Fig 4: PR Curve of DistilBERT with different thresholds
 
 #### Confusion Matrix Trends
 - Threshold 0.50 : Balanced performance between false positives (416) and false negatives (393). Suitable when both precision and recall are equally important.
-
-- Threshold 0.60 Slight reduction in false positives (377) with a small increase in false negatives (443). Appropriate if precision is marginally more important than recall.
-
-- Threshold 0.70 Significant drop in false positives (337) but noticeable increase in false negatives (493). Ideal for scenarios where minimizing false alarms is critical.
-
-- Threshold 0.80 - Minimal false positives (287) but higher false negatives (559). Best suited for applications where incorrect positive predictions have a high operational or financial cost.
-
+- Threshold 0.60 : Slight reduction in false positives (377) with a small increase in false negatives (443). Appropriate if precision is marginally more important than recall.
+- Threshold 0.70 : Significant drop in false positives (337) but noticeable increase in false negatives (493). Ideal for scenarios where minimizing false alarms is critical.
+- Threshold 0.80 : Minimal false positives (287) but higher false negatives (559). Best suited for applications where incorrect positive predictions have a high operational or financial cost.
+<img width="891" height="718" alt="image" src="https://github.com/user-attachments/assets/4b399eac-d3f4-46ba-b408-d7511a00d962" />
+Fig 5: Confusion matrix for DistilBERT with different thresholds
 
 ---
 
