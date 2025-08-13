@@ -62,10 +62,9 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 - Leverages pre-trained tokenizers and embeddings
 > Please refer to [EDA Notebook](/notebooks/Step_1.eda_preprocessing.ipynb) for details. There is also documentation related to preprocessing available on [Docs](/documentation/preprocessor.md).
 
-
 <figure>
- <img width="1340" height="449" alt="image" src="https://github.com/user-attachments/assets/8e8c4b98-eda7-42aa-8eb7-ff0925d91a71" />
-  <center>Data counts for  positive, negative classes</center>
+  <img width="1340" height="449" alt="image" src="https://github.com/user-attachments/assets/8e8c4b98-eda7-42aa-8eb7-ff0925d91a71" />
+  <p style="text-align: center;">Fig 1: Data counts for  positive, negative classes</p>
 </figure>
 
 ---
@@ -136,9 +135,14 @@ The final model was trained based on the best parameter and results found. For t
 | 9 | Scratch | Naive Bayes (TF-IDF) | 0.868 | 0.867 | ~30 sec | Custom implementation |
 | 10 | Scratch | KNN (TF-IDF) | 0.815 | 0.826 | ~5 min | Distance-based classifier |
 
+<div>
+  <p style="text-align: center;">Table 1: Comprehensive result comparison</p>
+</div>
+
+
 <figure>
   <img width="1341" height="664" alt="image" src="https://github.com/user-attachments/assets/1ba119fc-e379-4190-a08a-783c3a68b59a" />
-  <center>Top features selected by Linear SVC</center>
+  <p style="text-align: center;"s>Top features selected by Linear SVC</p>
 </figure>
 
 ### Cross-Validation Results (Top Models)
@@ -149,6 +153,9 @@ The final model was trained based on the best parameter and results found. For t
 | LinearSVC | 0.911 ± 0.005 | 0.005 | 0.911 ± 0.004 | 0.004 | Excellent |
 | GloVe + LSTM | 0.879 ± 0.007 | 0.007 | 0.879 ± 0.006 | 0.006 | Good |
 
+<div>
+  <p style="text-align: center;">Table 2: Cross validation statistics</p>
+</div>
 ---
 
 ## Performance Analysis
@@ -163,6 +170,11 @@ Deep learning models showed varying sensitivity to classification thresholds:
 | RNN | 0.6 | 0.887 | 0.888 | 0.881 | 0.896 | Recall-focused |
 | LSTM | 0.5 | 0.882 | 0.880 | 0.898 | 0.862 | Precision-focused |
 | GloVe-LSTM | 0.5 | 0.888 | 0.888 | 0.895 | 0.881 | Balanced |
+
+<div>
+  <p style="text-align: center;">Table 3: Performance metrices of DL methods</p>
+</div>
+
 
 ### Hyperparameter Optimization Results
 
@@ -318,6 +330,11 @@ movie-sentiment-classification/
 | Real-time Applications | LinearSVC | Fast inference, competitive accuracy    |
 | Resource Constrained | Naive Bayes | Minimal memory, decent performance      |
 | Interpretability Needed | Logistic Regression | Coefficients provide feature importance |
+
+<div>
+  <p style="text-align: center;">Table 4: Use case for models. </p>
+</div>
+
 
 ### Future Work
 
