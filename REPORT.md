@@ -276,8 +276,8 @@ movie-sentiment-classification/
 ├── requirements-prod.txt        # Production dependencies
 ├── Dockerfile                   # Container configuration
 ├── REPORT.md                   # Comprehensive project report
-├── README.md                   # Setup and usage instructions
-└── main.py                     # Main training script
+└── README.md                   # Setup and usage instructions
+
 ```
 
 ### Technical Implementation Notes
@@ -333,7 +333,7 @@ movie-sentiment-classification/
 ### A. Hardware and Environment
 - GPU: NVIDIA RTX 4070 Ti (12GB VRAM)
 - RAM: 64GB DDR5
-- Framework: PyTorch 1.12, Scikit-learn 1.1, Transformers 4.21
+- Framework: `PyTorch`, `Scikit-learn`, `Transformers`, `FastAPI`
 - Training Time: Total ~6 hours across all experiments
 
 ### B. Reproducibility

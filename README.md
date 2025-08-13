@@ -9,6 +9,9 @@ End-to-end pipeline for IMDB movie review sentiment analysis:
 - FastAPI inference server
 - Dockerized deployment
 
+> - See [Report](REPORT.md) for extensive analysis.
+> - [Documentation](/documentation) contains specific docs for the repo. 
+
 ## Environment
 
 - Python 3.10+
@@ -18,8 +21,6 @@ End-to-end pipeline for IMDB movie review sentiment analysis:
 
 ## Installation & Usage
 
-### Local Development
-```bash
 ### Local Development
 ```bash
 pip install -r requirements-dev.txt
@@ -124,10 +125,10 @@ docker run --rm -p 8000:8000 \
 > The container expects MODEL_DIR to point inside the container to a directory containing the HF model files (config.json, tokenizer.json, vocab.txt or merges.txt/bpe, model.safetensors, etc.).
 
 ## Notebooks
-- Step_1.eda_preprocessing.ipynb – EDA and cleaning
-- Step_2.ML_classification.ipynb – scratch + sklearn baselines
-- Step_3.DNN_Classification.ipynb – DNN/GRU/LSTM + DistilBERT training
-- Step_4.CrossVal_Tuning.ipynb – K-fold CV and grid search
+- [Step_1.eda_preprocessing.ipynb](/notebooks/Step_1.eda_preprocessing.ipynb) – EDA and cleaning
+- [Step_2.ML_classification.ipynb](/notebooks/Step_2.ML_classification.ipynb) – scratch + sklearn baselines
+- [Step_3.DNN_Classification.ipynb](/notebooks/Step_3.DNN_Classification.ipynb) – DNN/GRU/LSTM + DistilBERT training
+- [Step_4.CrossVal_Tuning.ipynb](/notebooks/Step_4.CrossVal_Tuning.ipynb) – K-fold CV and grid search
 
 ## Report
-- See [Report](REPORT.md) for detail analysis.
+- See [Report](REPORT.md) for detailed analysis.
