@@ -9,3 +9,6 @@ __pycache__/
 
 .cache/
 .pytest_cache/
+
+runs/distilbert_auto
+runs/glove_lstm
