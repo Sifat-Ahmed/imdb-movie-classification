@@ -62,10 +62,6 @@ The goal is to classify IMDB movie reviews as positive or negative sentiment usi
 - Leverages pre-trained tokenizers and embeddings
 > Please refer to [EDA Notebook](/notebooks/Step_1.eda_preprocessing.ipynb) for details. There is also documentation related to preprocessing available on [Docs](/documentation/preprocessor.md).
 
-### Data Quality Analysis
-*[Recommend Graph 1: Review length distribution histogram]*
-*[Recommend Graph 2: Word frequency analysis (top 20 words by sentiment)]*
-
 ---
 
 ## Methodology
