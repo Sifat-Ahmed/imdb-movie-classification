@@ -287,7 +287,8 @@ movie-sentiment-classification/
 │   ├── IMDB_Dataset.csv
 │   └── imdb_reviews.parquet
 ├── documentation/
-│   ├── API_DOCUMENTATION.md      # Your comprehensive API docs
+│   ├── api.md
+│   ├── models.md      
 │   ├── preprocessor.md
 │   ├── vectorizer.md
 │   └── classifier.md
